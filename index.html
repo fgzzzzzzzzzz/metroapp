@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro Metro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF6B00;
+            --black: #111111;
+            --white: #FFFFFF;
+            --background: #F8F9FA;
+            --border-radius: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 172px;
+            background: var(--black);
+            padding: 1.1rem;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .company-name {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 1.6rem;
+            font-weight: 600;
+        }
+
+        .city-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .city-btn {
+            color: var(--white);
+            padding: 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .city-btn.active,
+        .city-btn:hover {
+            background: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 172px;
+            padding: 1.6rem;
+            flex: 1;
+            max-width: 756px;
+        }
+
+        .form-card {
+            background: var(--white);
+            padding: 1.3rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            margin-bottom: 1.6rem;
+        }
+
+        .input-group {
+            margin-bottom: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(97px, 1fr));
+            gap: 0.5rem;
+            margin: 0.9rem 0;
+        }
+
+        .option-btn {
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .option-btn.active {
+            border-color: var(--primary);
+            background: rgba(255,107,0,0.08);
+            color: var(--primary);
+        }
+
+        #registerBtn {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 0.6rem;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.1rem;
+        }
+
+        .total-box {
+            background: rgba(255,107,0,0.08);
+            color: var(--primary);
+            padding: 0.7rem 1.1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .history-item {
+            background: var(--white);
+            padding: 0.9rem;
+            border-radius: 4px;
+            margin-bottom: 0.7rem;
+            display: grid;
+            grid-template-columns: 20px 1fr auto;
+            gap: 0.9rem;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .history-details {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.4rem;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .delete-btn:hover {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="company-name">METRO CONSTRUTORA LTDA</div>
+            <div class="city-menu">
+                <div class="city-btn active" data-city="all">Todas Cidades</div>
+                <div class="city-btn" data-city="Central de Minas">Central Minas</div>
+                <div class="city-btn" data-city="Itabirinha">Itabirinha</div>
+                <div class="city-btn" data-city="São José do Divino">São José do Divino</div>
+                <div class="city-btn" data-city="Governador Valadares">Gov. Valadares</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="form-card">
+                <div class="input-group">
+                    <input type="text" id="place" placeholder="Local/Estabelecimento">
+                </div>
+                
+                <div class="options-grid" id="paymentMethods">
+                    <div class="option-btn active" data-value="DINHEIRO">Dinheiro</div>
+                    <div class="option-btn" data-value="PIX">PIX</div>
+                    <div class="option-btn" data-value="TED">TED</div>
+                    <div class="option-btn" data-value="BOLETO">Boleto</div>
+                </div>
+
+                <div class="options-grid" id="cities">
+                    <div class="option-btn active" data-value="Central de Minas">Central Minas</div>
+                    <div class="option-btn" data-value="Itabirinha">Itabirinha</div>
+                    <div class="option-btn" data-value="São José do Divino">São José do Divino</div>
+                    <div class="option-btn" data-value="Governador Valadares">Gov. Valadares</div>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="amount" placeholder="Valor (R$ 0,00)">
+                </div>
+
+                <button id="registerBtn">Registrar Pagamento</button>
+            </div>
+
+            <div class="history-header">
+                <h2>Histórico</h2>
+                <div class="total-box" id="total">Total: R$ 0,00</div>
+            </div>
+            <div id="history"></div>
+        </div>
+    </div>
+
+    <script>
+        const { jsPDF } = window.jspdf;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let payments = JSON.parse(localStorage.getItem('payments')) || [];
+            let selectedPayments = [];
+            let currentFilter = 'all';
+            let selectedPaymentMethod = 'DINHEIRO';
+            let selectedCity = 'Central de Minas';
+
+            const formatCurrency = (value) => {
+                return value.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                });
+            };
+
+            // Formatação automática do campo de valor
+            const amountInput = document.getElementById('amount');
+            amountInput.addEventListener('input', formatCurrencyInput);
+
+            function formatCurrencyInput(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 2) {
+                    value = value.replace(/^0+/, '');
+                    value = value.padStart(3, '0');
+                    const integer = value.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    const decimal = value.slice(-2);
+                    e.target.value = `${integer},${decimal}`;
+                } else {
+                    value = value.padStart(2, '0');
+                    e.target.value = `0,${value}`;
+                }
+            }
+
+            document.getElementById('place').addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') document.getElementById('registerBtn').click();
+            });
+
+            document.getElementById('amount').addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') document.getElementById('registerBtn').click();
+            });
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const parent = this.parentElement.id;
+                    document.querySelectorAll(`#${parent} .option-btn`).forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    parent === 'paymentMethods' 
+                        ? selectedPaymentMethod = this.dataset.value 
+                        : selectedCity = this.dataset.value;
+                });
+            });
+
+            document.querySelectorAll('.city-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.city;
+                    renderHistory();
+                });
+            });
+
+            document.getElementById('registerBtn').addEventListener('click', () => {
+                const place = document.getElementById('place').value.trim();
+                const amount = parseFloat(document.getElementById('amount').value.replace(/\./g, '').replace(',', '.'));
+
+                if(place && amount > 0) {
+                    const newPayment = {
+                        id: Date.now(),
+                        place,
+                        amount,
+                        paymentMethod: selectedPaymentMethod,
+                        city: selectedCity,
+                        date: new Date().toLocaleDateString('pt-BR'),
+                        time: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})
+                    };
+
+                    payments.unshift(newPayment);
+                    localStorage.setItem('payments', JSON.stringify(payments));
+                    renderHistory();
+
+                    document.getElementById('place').value = '';
+                    document.getElementById('amount').value = '';
+                }
+            });
+
+            window.generatePDF = (paymentId) => {
+                const payment = payments.find(p => p.id === paymentId);
+                const doc = new jsPDF();
+                
+                doc.setFillColor(255, 107, 0);
+                doc.rect(0, 0, 210, 25, 'F');
+                doc.setFontSize(16);
+                doc.setTextColor(255);
+                doc.text("METRO CONSTRUTORA LTDA", 105, 15, { align: 'center' });
+                
+                doc.setFontSize(10);
+                doc.setTextColor(40);
+                const details = [
+                    `Comprovante Nº: ${payment.id}`,
+                    `Data: ${payment.date} ${payment.time}`,
+                    `Local: ${payment.place}`,
+                    `Valor: ${formatCurrency(payment.amount)}`,
+                    `Forma: ${payment.paymentMethod}`,
+                    `Cidade: ${payment.city.replace("Governador", "Gov.")}`
+                ];
+                
+                details.forEach((line, index) => {
+                    doc.text(20, 40 + (index * 7), line);
+                });
+
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("CNPJ: 29.603.603/0001-60", 20, 280);
+
+                doc.save(`comprovante-${payment.id}.pdf`);
+            };
+
+            window.printPayment = (paymentId) => {
+                const payment = payments.find(p => p.id === paymentId);
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <h1>METRO CONSTRUTORA LTDA</h1>
+                    <h3>Comprovante de Pagamento</h3>
+                    <p><strong>ID:</strong> ${payment.id}</p>
+                    <p><strong>Data:</strong> ${payment.date} ${payment.time}</p>
+                    <p><strong>Local:</strong> ${payment.place}</p>
+                    <p><strong>Valor:</strong> ${formatCurrency(payment.amount)}</p>
+                    <p><strong>Forma:</strong> ${payment.paymentMethod}</p>
+                    <p><strong>Cidade:</strong> ${payment.city.replace("Governador", "Gov.")}</p>
+                    <p><strong>CNPJ:</strong> 29.603.603/0001-60</p>
+                `);
+                printWindow.print();
+            };
+
+            const updateTotal = () => {
+                const total = selectedPayments.reduce((sum, p) => sum + p.amount, 0);
+                document.getElementById('total').textContent = `Total: ${formatCurrency(total)}`;
+            };
+
+            // Função para deletar registro
+            window.deletePayment = (paymentId) => {
+                if(confirm('Tem certeza que deseja excluir este registro?')) {
+                    payments = payments.filter(p => p.id !== paymentId);
+                    selectedPayments = selectedPayments.filter(p => p.id !== paymentId);
+                    localStorage.setItem('payments', JSON.stringify(payments));
+                    renderHistory();
+                }
+            };
+
+            const renderHistory = () => {
+                const historyDiv = document.getElementById('history');
+                const filtered = currentFilter === 'all' 
+                    ? payments 
+                    : payments.filter(p => p.city === currentFilter);
+
+                historyDiv.innerHTML = filtered.map(payment => `
+                    <div class="history-item">
+                        <input type="checkbox" onchange="togglePayment(${payment.id}, this.checked)">
+                        <div>
+                            <div>${payment.place}</div>
+                            <div class="history-details">
+                                ${payment.date} ${payment.time} | 
+                                ${payment.paymentMethod} | 
+                                ${payment.city.replace("Governador", "Gov.")}
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <div>${formatCurrency(payment.amount)}</div>
+                            <button class="action-btn" onclick="generatePDF(${payment.id})">
+                                <i class="fas fa-file-pdf"></i>
+                            </button>
+                            <button class="action-btn" onclick="printPayment(${payment.id})">
+                                <i class="fas fa-print"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deletePayment(${payment.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('') || '<div>Nenhum registro encontrado</div>';
+
+                updateTotal();
+            };
+
+            window.togglePayment = (id, checked) => {
+                const payment = payments.find(p => p.id === id);
+                checked 
+                    ? selectedPayments.push(payment) 
+                    : selectedPayments = selectedPayments.filter(p => p.id !== id);
+                updateTotal();
+            };
+
+            renderHistory();
+        });
+    </script>
+</body>
+</html>
